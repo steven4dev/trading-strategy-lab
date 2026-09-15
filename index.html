@@ -67,9 +67,9 @@
   body{
     margin:0; background:var(--paper); color:var(--ink);
     font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
-    padding:28px 20px 60px; display:flex; flex-direction:column; gap:22px;
+    padding:20px 16px 48px; display:flex; flex-direction:column; gap:18px;
   }
-  .wrap{ max-width:1080px; margin:0 auto; width:100%; display:flex; flex-direction:column; gap:22px; }
+  .wrap{ width:100%; display:flex; flex-direction:column; gap:18px; }
 
   header{ display:flex; flex-direction:column; gap:6px; }
   .eyebrow-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
@@ -78,25 +78,30 @@
     color:var(--ink-faint); font-weight:500;
   }
   .controls{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
-  .field{ display:inline-flex; align-items:center; gap:7px; font-size:12px; color:var(--ink-faint); }
+  .settings-panel{ padding:12px 14px 12px; }
+  .settings-panel .panel-head{ margin-bottom:6px; }
+  .settings-panel .controls{ gap:8px 12px; margin-top:4px; }
+  .field{ display:inline-flex; align-items:center; gap:5px; font-size:11.5px; color:var(--ink-faint); white-space:nowrap; }
   .field select, .field input{
-    font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--ink-soft);
-    background:var(--surface); border:1px solid var(--line); border-radius:6px;
-    padding:4px 8px; cursor:pointer;
+    font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-soft);
+    background:var(--surface); border:1px solid var(--line); border-radius:5px;
+    padding:3px 6px; cursor:pointer;
   }
-  .field input[type="number"]{ width:108px; font-variant-numeric:tabular-nums; cursor:text; }
-  .checkbox-field{ gap:6px; }
-  .checkbox-field input[type="checkbox"]{ width:14px; height:14px; accent-color:var(--accent); cursor:pointer; }
+  .field input[type="number"]{ width:56px; font-variant-numeric:tabular-nums; cursor:text; }
+  .settings-panel #capitalInput{ width:96px; }
+  .checkbox-field{ gap:5px; }
+  .checkbox-field input[type="checkbox"]{ width:13px; height:13px; accent-color:var(--accent); cursor:pointer; }
 
   .recalc-btn{
-    font-family:"IBM Plex Mono",monospace; font-size:12px; font-weight:600; color:var(--paper);
-    background:var(--accent); border:1px solid var(--accent); border-radius:6px;
-    padding:5px 14px; cursor:pointer; letter-spacing:.02em;
+    font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:600; color:var(--paper);
+    background:var(--accent); border:1px solid var(--accent); border-radius:5px;
+    padding:4px 12px; cursor:pointer; letter-spacing:.02em;
   }
   .recalc-btn:hover{ filter:brightness(1.08); }
   .recalc-btn:active{ filter:brightness(0.94); }
   .recalc-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
   .recalc-btn.is-dirty{ box-shadow:0 0 0 3px var(--accent-soft); }
+
   .field select:hover, .field input:hover{ border-color:var(--ink-faint); }
   .field select:focus-visible, .field input:focus-visible{ outline:2px solid var(--accent); outline-offset:1px; }
 
@@ -133,6 +138,9 @@
   .stat .value.pos{ color:var(--rise); }
   .stat .value.neg{ color:var(--fall); }
   .stat .note{ font-size:11.5px; color:var(--ink-faint); }
+  .stat-hero{ background:var(--accent-soft); border-color:var(--accent); }
+  .stat-hero .label{ color:var(--accent); }
+  .stat-hero .value{ color:var(--ink); font-size:21px; }
 
   .panel{
     background:var(--surface); border:1px solid var(--line); border-radius:12px;
@@ -220,83 +228,12 @@
   <header>
     <div class="eyebrow-row">
       <div class="eyebrow">程式交易策略回測</div>
-      <div class="controls">
-        <label class="field">
-          <span>標的</span>
-          <select id="tickerSelect">
-            <option value="0050.TW">0050 元大台灣50</option>
-            <option value="0052.TW">0052 富邦科技</option>
-            <option value="00631L.TW">00631L 元大台灣50正2</option>
-            <option value="00685L.TW" selected>00685L 群益台灣加權正2</option>
-            <option value="2330.TW">2330 台積電</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>初始資金 (TWD)</span>
-          <input type="number" id="capitalInput" value="1000000" min="10000" step="10000">
-        </label>
-        <label class="field">
-          <span>回測期間</span>
-          <select id="periodSelect">
-            <option value="all" selected>全部</option>
-            <option value="1">近1年</option>
-            <option value="2">近2年</option>
-            <option value="3">近3年</option>
-            <option value="5">近5年</option>
-            <option value="10">近10年</option>
-            <option value="15">近15年</option>
-            <option value="20">近20年</option>
-          </select>
-        </label>
-      </div>
-    </div>
-    <div class="eyebrow-row params-row">
-      <div class="eyebrow">進出場參數</div>
-      <div class="controls">
-        <label class="field">
-          <span>布林週期</span>
-          <input type="number" id="bbWindowInput" value="20" min="5" max="120" step="1">
-        </label>
-        <label class="field">
-          <span>布林標準差</span>
-          <input type="number" id="bbStdInput" value="2" min="0.5" max="4" step="0.1">
-        </label>
-        <label class="field">
-          <span>KD 天數(N)</span>
-          <input type="number" id="kdNInput" value="9" min="3" max="60" step="1">
-        </label>
-        <label class="field">
-          <span>K平滑(M1)</span>
-          <input type="number" id="kdM1Input" value="3" min="1" max="20" step="1">
-        </label>
-        <label class="field">
-          <span>D平滑(M2)</span>
-          <input type="number" id="kdM2Input" value="3" min="1" max="20" step="1">
-        </label>
-        <label class="field">
-          <span>買進門檻 K&lt;</span>
-          <input type="number" id="kdBuyInput" value="20" min="1" max="49" step="1">
-        </label>
-        <label class="field">
-          <span>賣出門檻 K&gt;</span>
-          <input type="number" id="kdSellInput" value="80" min="51" max="99" step="1">
-        </label>
-        <label class="field checkbox-field">
-          <input type="checkbox" id="trendFilterCheckbox">
-          <span>買進需均線上揚</span>
-        </label>
-        <label class="field">
-          <span>趨勢均線(日)</span>
-          <input type="number" id="maTrendNInput" value="20" min="5" max="240" step="1">
-        </label>
-        <button type="button" class="recalc-btn" id="recalcBtn">重新計算</button>
-      </div>
     </div>
     <h1 id="title">KD × 布林通道逆勢策略 — 00685L</h1>
     <p class="sub" id="subtitle">資料來源 Yahoo Finance，日線收盤價。灰線為股價，金色虛線為布林通道（20日，2倍標準差），藍色三角為買進訊號、橘色三角為賣出訊號。</p>
     <div class="rule-def">
-      進場：<b>KD(<span id="rdN">9</span>,<span id="rdM1">3</span>,<span id="rdM2">3</span>) K值 &lt; <span id="rdBuy">20</span></b> 且 <b>收盤價 &lt; 布林下軌（<span id="rdWin">20</span>日，<span id="rdStd">2</span>倍標準差）</b><span id="rdTrendClause"></span> &nbsp;→&nbsp; 買進<br>
-      出場：<b class="s">K值 &gt; <span id="rdSell">80</span></b> 且 <b class="s">收盤價 &gt; 布林上軌</b> &nbsp;→&nbsp; 賣出<br>
+      進場：<b>KD(<span id="rdN">9</span>,<span id="rdM1">3</span>,<span id="rdM2">3</span>) K值 &lt; <span id="rdBuy">15</span></b> 且 <b>收盤價 &lt; 布林下軌（<span id="rdWin">20</span>日，<span id="rdStd">2</span>倍標準差）</b><span id="rdTrendClause"></span> &nbsp;→&nbsp; 買進<br>
+      出場：<b class="s">K值 &gt; <span id="rdSell">95</span></b> 且 <b class="s">收盤價 &gt; 布林上軌</b> &nbsp;→&nbsp; 賣出<br>
       每次買進投入「當下全部可用資金」（含先前獲利），賣出後資金全數回到帳上等待下次訊號 — 獲利會複利再投入，不會抽出。
     </div>
   </header>
@@ -308,6 +245,78 @@
     <div class="report-meta" id="reportMeta"></div>
     <div class="report-notice" id="reportNotice" hidden></div>
     <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="panel settings-panel">
+    <div class="panel-head">
+      <h2>設定參數</h2>
+    </div>
+    <div class="controls">
+      <label class="field">
+        <span>標的</span>
+        <select id="tickerSelect">
+          <option value="0050.TW">0050 元大台灣50</option>
+          <option value="0052.TW">0052 富邦科技</option>
+          <option value="00631L.TW">00631L 元大台灣50正2</option>
+          <option value="00685L.TW" selected>00685L 群益台灣加權正2</option>
+          <option value="2330.TW">2330 台積電</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>初始資金 (TWD)</span>
+        <input type="number" id="capitalInput" value="1000000" min="10000" step="10000">
+      </label>
+      <label class="field">
+        <span>回測期間</span>
+        <select id="periodSelect">
+          <option value="all" selected>全部</option>
+          <option value="1">近1年</option>
+          <option value="2">近2年</option>
+          <option value="3">近3年</option>
+          <option value="5">近5年</option>
+          <option value="10">近10年</option>
+          <option value="15">近15年</option>
+          <option value="20">近20年</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>布林週期</span>
+        <input type="number" id="bbWindowInput" value="20" min="5" max="120" step="1">
+      </label>
+      <label class="field">
+        <span>布林標準差</span>
+        <input type="number" id="bbStdInput" value="2" min="0.5" max="4" step="0.1">
+      </label>
+      <label class="field">
+        <span>KD 天數(N)</span>
+        <input type="number" id="kdNInput" value="9" min="3" max="60" step="1">
+      </label>
+      <label class="field">
+        <span>K平滑(M1)</span>
+        <input type="number" id="kdM1Input" value="3" min="1" max="20" step="1">
+      </label>
+      <label class="field">
+        <span>D平滑(M2)</span>
+        <input type="number" id="kdM2Input" value="3" min="1" max="20" step="1">
+      </label>
+      <label class="field">
+        <span>買進門檻 K&lt;</span>
+        <input type="number" id="kdBuyInput" value="15" min="1" max="49" step="1">
+      </label>
+      <label class="field">
+        <span>賣出門檻 K&gt;</span>
+        <input type="number" id="kdSellInput" value="95" min="51" max="99" step="1">
+      </label>
+      <label class="field checkbox-field">
+        <input type="checkbox" id="trendFilterCheckbox">
+        <span>買進需均線上揚</span>
+      </label>
+      <label class="field">
+        <span>趨勢均線(日)</span>
+        <input type="number" id="maTrendNInput" value="20" min="5" max="240" step="1">
+      </label>
+      <button type="button" class="recalc-btn" id="recalcBtn">重新計算</button>
+    </div>
   </div>
 
   <div class="panel">
@@ -556,8 +565,8 @@ function readParams(){
     kdN: Math.max(3, Math.round(num('kdNInput', 9))),
     kdM1: Math.max(1, Math.round(num('kdM1Input', 3))),
     kdM2: Math.max(1, Math.round(num('kdM2Input', 3))),
-    kdBuy: Math.min(49, Math.max(1, Math.round(num('kdBuyInput', 20)))),
-    kdSell: Math.min(99, Math.max(51, Math.round(num('kdSellInput', 80)))),
+    kdBuy: Math.min(49, Math.max(1, Math.round(num('kdBuyInput', 15)))),
+    kdSell: Math.min(99, Math.max(51, Math.round(num('kdSellInput', 95)))),
     trendFilterOn: document.getElementById('trendFilterCheckbox').checked,
     maTrendN: Math.max(5, Math.round(num('maTrendNInput', 20))),
   };
@@ -607,11 +616,11 @@ function renderTicker(key){
     <span>標的 <b>${D.label}</b></span>
     <span>回測期間 <b>${S[0].date} ~ ${S[S.length-1].date}</b></span>
     <span>初始資金 <b>NT$ ${fmtInt(capital)}</b></span>
-    <span>期末資產 <b>NT$ ${fmtInt(stats0.final_equity)}</b></span>
   `;
 
   const statEl = document.getElementById('stats');
   const stats = [
+    { label:'期末資產', value:'NT$ '+fmtInt(stats0.final_equity), hero:true },
     { label:'策略總報酬率', value: stats0.total_return.toFixed(2)+'%', cls: stats0.total_return>=0?'pos':'neg' },
     { label:'買進持有報酬率', value: stats0.buy_hold_return.toFixed(2)+'%', cls: stats0.buy_hold_return>=0?'pos':'neg' },
     { label:'最大回撤 MDD', value: stats0.max_dd.toFixed(2)+'%', cls:'neg' },
@@ -620,7 +629,7 @@ function renderTicker(key){
     { label:'平均每筆報酬', value: stats0.avg_pnl.toFixed(2)+'%', cls: stats0.avg_pnl>=0?'pos':'neg' },
   ];
   statEl.innerHTML = stats.map(s => `
-    <div class="stat">
+    <div class="stat${s.hero?' stat-hero':''}">
       <div class="label">${s.label}</div>
       <div class="value ${s.cls||''}">${s.value}</div>
       ${s.note?`<div class="note">${s.note}</div>`:''}
@@ -947,6 +956,7 @@ recalcBtn.addEventListener('click', rerender);
 });
 
 rerender();
+
 </script>
 
 
