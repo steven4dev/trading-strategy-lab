@@ -105,6 +105,30 @@
   .checkbox-field{ gap:5px; }
   .checkbox-field input[type="checkbox"]{ width:13px; height:13px; accent-color:var(--accent); cursor:pointer; }
 
+  /* 數字欄位的 +/- 微調按鈕：手機上不用叫出數字鍵盤就能調參數 */
+  .stepper{ display:inline-flex; align-items:stretch; border:1px solid var(--line); border-radius:5px; overflow:hidden; }
+  .stepper input[type="number"]{
+    border:none; border-radius:0; padding:3px 2px; text-align:center;
+    -moz-appearance:textfield;
+  }
+  .stepper input[type="number"]::-webkit-inner-spin-button,
+  .stepper input[type="number"]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
+  .step-btn{
+    appearance:none; border:none; background:var(--surface-sunk); color:var(--ink-soft);
+    font-family:"IBM Plex Mono",monospace; font-size:14px; font-weight:700; line-height:1;
+    width:26px; min-height:26px; padding:0; cursor:pointer; flex:0 0 auto;
+  }
+  .step-btn:hover{ background:var(--accent-soft); color:var(--accent); }
+  .step-btn:active{ filter:brightness(0.92); }
+  .step-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:-2px; }
+  .step-minus{ border-right:1px solid var(--line); }
+  .step-plus{ border-left:1px solid var(--line); }
+  .stepper:has(input:disabled) .step-btn{ opacity:.4; cursor:not-allowed; }
+  .stepper:has(input:disabled) input{ opacity:.5; }
+  @media (max-width:640px){
+    .step-btn{ width:30px; min-height:30px; font-size:16px; } /* 手機上再放大一點好點按 */
+  }
+
   .recalc-btn{
     font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:600; color:var(--paper);
     background:var(--accent); border:1px solid var(--accent); border-radius:5px;
@@ -441,6 +465,37 @@ document.querySelectorAll('.collapse-btn').forEach(btn=>{
     btn.textContent = expanded ? '展開' : '收合';
     body.hidden = expanded;
   });
+});
+
+// 每個數字輸入框加上 +/- 按鈕：手機上不用叫出數字鍵盤打字，直接點按就能微調參數。
+document.querySelectorAll('input[type="number"]').forEach(input=>{
+  const wrap = document.createElement('div');
+  wrap.className = 'stepper';
+  input.parentNode.insertBefore(wrap, input);
+  const minus = document.createElement('button');
+  minus.type = 'button'; minus.className = 'step-btn step-minus'; minus.textContent = '−';
+  minus.setAttribute('aria-label', '減少');
+  const plus = document.createElement('button');
+  plus.type = 'button'; plus.className = 'step-btn step-plus'; plus.textContent = '+';
+  plus.setAttribute('aria-label', '增加');
+  wrap.append(minus, input, plus);
+
+  function step(dir){
+    if (input.disabled) return;
+    const stepVal = parseFloat(input.step) || 1;
+    const min = input.min !== '' ? parseFloat(input.min) : -Infinity;
+    const max = input.max !== '' ? parseFloat(input.max) : Infinity;
+    let cur = parseFloat(input.value);
+    if (!Number.isFinite(cur)) cur = Number.isFinite(min) ? min : 0;
+    let next = Math.min(max, Math.max(min, cur + dir*stepVal));
+    const decimals = (String(stepVal).split('.')[1] || '').length;
+    next = parseFloat(next.toFixed(decimals));
+    input.value = next;
+    input.dispatchEvent(new Event('input', { bubbles:true }));
+    input.dispatchEvent(new Event('change', { bubbles:true }));
+  }
+  minus.addEventListener('click', ()=> step(-1));
+  plus.addEventListener('click', ()=> step(1));
 });
 
 const ALL = JSON.parse(document.getElementById('backtest-data').textContent).tickers;
